@@ -13,7 +13,7 @@ Item {
   property var shell: null
   property var manifest: null
 
-  readonly property string pluginId: manifest && manifest.id ? String(manifest.id) : "andrestascon.keys"
+  readonly property string pluginId: manifest && manifest.id ? String(manifest.id) : "omarchy-keycaps"
 
   // Ordered list of currently-displayed keys as { code, ord, label, wide }.
   // The panel binds to it.
@@ -168,7 +168,7 @@ Item {
   }
 
   IpcHandler {
-    target: "andrestascon.keys"
+    target: root.pluginId
 
     function keyEvent(code: string, pressed: string): string {
       var trimmed = String(code || "").trim()

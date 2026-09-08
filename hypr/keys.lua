@@ -1,4 +1,4 @@
--- Keycaps bridge for the andrestascon.keys Omarchy shell plugin.
+-- Keycaps bridge for the omarchy-keycaps Omarchy shell plugin.
 --
 -- Hooks Hyprland's global keyboard event stream and forwards press/release
 -- events for shortcut modifiers and shortcuts to the shell service.
@@ -6,7 +6,7 @@
 -- Ignores normal typing (letters/numbers/space without a shortcut modifier)
 -- so keycaps only appear when shortcuts are invoked.
 
-local plugin_id = "andrestascon.keys"
+local plugin_id = "omarchy-keycaps"
 
 local function send_key(key, pressed)
   hl.exec_cmd("omarchy-shell -q " .. plugin_id .. " keyEvent " .. tostring(key) .. " " .. (pressed and "1" or "0"))

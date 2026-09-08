@@ -28,7 +28,7 @@ omarchy plugin add https://github.com/atascg01/omarchy-keycaps --enable
 Key events are captured through Hyprland's lightweight event stream and forwarded via IPC. Run the bundled installer to hook the bridge:
 
 ```bash
-bash ~/.config/omarchy/plugins/andrestascon.keys/install.sh
+bash ~/.config/omarchy/plugins/omarchy-keycaps/install.sh
 hyprctl reload
 ```
 
@@ -36,7 +36,7 @@ hyprctl reload
 
 ## How It Works
 
-1. **Hyprland Event Hook** (`hypr/keys.lua`): A non-blocking Lua hook on Hyprland's `input.keyboard.key` stream that forwards raw key press and release events via fire-and-forget IPC (`omarchy-shell -q andrestascon.keys keyEvent <code> <0|1>`). Automatically cleans up and flushes keys on modifier release or compositor reload.
+1. **Hyprland Event Hook** (`hypr/keys.lua`): A non-blocking Lua hook on Hyprland's `input.keyboard.key` stream that forwards raw key press and release events via fire-and-forget IPC (`omarchy-shell -q omarchy-keycaps keyEvent <code> <0|1>`). Automatically cleans up and flushes keys on modifier release or compositor reload.
 2. **Quickshell Service** (`Service.qml`): Runs in the background inside Omarchy shell. Tracks active modifier states, sequences key presses, and manages the dismissal countdown.
 3. **Quickshell Overlay Panel** (`Panel.qml`): Multi-monitor aware Quickshell layer surface rendered on `Hyprland.focusedMonitor` with smooth entry/exit opacity and slide transitions.
 
@@ -48,13 +48,13 @@ Verify that the service is running and responsive:
 
 ```bash
 # Ping the service
-omarchy-shell andrestascon.keys ping
+omarchy-shell omarchy-keycaps ping
 
 # Simulate manual key events:
-omarchy-shell andrestascon.keys keyEvent SUPER 1   # Super down
-omarchy-shell andrestascon.keys keyEvent 65 1      # Space down
-omarchy-shell andrestascon.keys keyEvent 65 0      # Space up
-omarchy-shell andrestascon.keys keyEvent SUPER 0   # Super up
+omarchy-shell omarchy-keycaps keyEvent SUPER 1   # Super down
+omarchy-shell omarchy-keycaps keyEvent 65 1      # Space down
+omarchy-shell omarchy-keycaps keyEvent 65 0      # Space up
+omarchy-shell omarchy-keycaps keyEvent SUPER 0   # Super up
 ```
 
 ---
@@ -65,11 +65,11 @@ To cleanly remove the plugin:
 
 ```bash
 # 1. Unhook the Lua bridge from ~/.config/hypr/hyprland.lua:
-bash ~/.config/omarchy/plugins/andrestascon.keys/install.sh --uninstall
+bash ~/.config/omarchy/plugins/omarchy-keycaps/install.sh --uninstall
 hyprctl reload
 
 # 2. Remove the plugin from Omarchy shell:
-omarchy plugin remove andrestascon.keys --yes
+omarchy plugin remove omarchy-keycaps --yes
 ```
 
 ---
