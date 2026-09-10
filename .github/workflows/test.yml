@@ -1,0 +1,32 @@
+name: Tests
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test runtimes
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lua5.4 libegl1 libopengl0
+          python -m pip install PySide6-Essentials==6.11.2
+      - name: Shortcut and settings regressions
+        run: node --test tests/*.test.js
+      - name: Lua bridge regressions
+        run: lua5.4 tests/bridge.test.lua
+      - name: Installer regressions
+        run: bash tests/installer.test.sh
+      - name: Headless QML integration
+        run: python tests/qml-smoke.py

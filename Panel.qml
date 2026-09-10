@@ -3,7 +3,6 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.Commons
-import qs.Ui
 
 // Keycaps panel: a bottom-centered row of Omarchy-styled keycaps. Rendered
 // from the keys service's heldModel.
@@ -31,11 +30,13 @@ Item {
   readonly property var keys: service ? service.heldModel : []
   readonly property bool active: opened && keys.length > 0
 
-  readonly property int capMinWidth: Style.space(38)
-  readonly property int capPaddingX: Style.space(12)
-  readonly property int capHeight: Style.space(42)
-  readonly property int capLip: Style.space(3)
-  readonly property int gap: Style.space(8)
+  readonly property real keycapScale: service ? service.keycapScale : 1
+  readonly property int bottomOffset: service ? service.bottomOffset : 64
+  readonly property int capMinWidth: Style.space(38 * keycapScale)
+  readonly property int capPaddingX: Style.space(12 * keycapScale)
+  readonly property int capHeight: Style.space(42 * keycapScale)
+  readonly property int capLip: Math.max(1, Style.space(3 * keycapScale))
+  readonly property int gap: Style.space(8 * keycapScale)
 
   PanelWindow {
     id: panel
@@ -53,7 +54,7 @@ Item {
       id: capsContainer
       anchors.horizontalCenter: parent.horizontalCenter
       anchors.bottom: parent.bottom
-      anchors.bottomMargin: Style.space(64)
+      anchors.bottomMargin: Style.space(root.bottomOffset)
       width: capsRow.width
       height: capsRow.height
 
@@ -86,7 +87,7 @@ Item {
 
             readonly property bool isHeld: modelData.held === true
             readonly property int baseWidth: Math.max(
-              modelData.wide ? Style.space(52) : root.capMinWidth,
+              modelData.wide ? Style.space(52 * root.keycapScale) : root.capMinWidth,
               labelText.implicitWidth + root.capPaddingX * 2
             )
 
@@ -105,7 +106,7 @@ Item {
               anchors.right: parent.right
               anchors.bottom: parent.bottom
               height: parent.height - root.capLip
-              radius: Style.cornerRadius
+              radius: Style.cornerRadius * root.keycapScale
               color: Qt.darker(Color.popups.background, 1.3)
               border.width: 1
               border.color: Util.alpha(Color.popups.border, 0.4)
@@ -118,7 +119,7 @@ Item {
               y: keycapDelegate.isHeld ? root.capLip : 0
               width: parent.width
               height: parent.height - root.capLip
-              radius: Style.cornerRadius
+              radius: Style.cornerRadius * root.keycapScale
 
               // Solid opaque popup background tinted with theme accent when pressed
               color: keycapDelegate.isHeld
@@ -159,7 +160,7 @@ Item {
                 color: Color.popups.text
                 font.family: Style.font.family
                 font.bold: true
-                font.pixelSize: Style.font.body
+                font.pixelSize: Math.max(1, Math.round(Style.font.body * root.keycapScale))
               }
             }
           }
