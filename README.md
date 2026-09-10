@@ -73,7 +73,11 @@ omarchy-shell omarchy-keycaps getSettings
 After upgrading plugin **code**, run `omarchy-restart-shell` and `hyprctl reload`.
 Omarchy retains `keepLoaded` service instances until the shell restarts.
 The bridge requires Hyprland's Lua API, including `hl.dsp.event`; labels remain
-a fixed XKB mapping with support for the applied `altwin:swap_lalt_lwin` option.
+a fixed XKB mapping with support for the global `altwin:swap_lalt_lwin` option
+and literal `kb_options` assignments in `~/.config/hypr/input.lua` (including
+Keychron device overrides). Commented examples are ignored. This mapping is
+shared across keyboards because the Lua key event does not identify the source
+device; simultaneous keyboards with different mappings are not distinguished.
 
 ---
 

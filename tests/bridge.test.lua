@@ -1,10 +1,13 @@
 -- Run from the repo root: lua tests/bridge.test.lua
-local function bridge(options)
+local function bridge(options, input_config)
   local events, timers, messages, down = {}, {}, {}, {}
   local config = options or ""
   local env = setmetatable({
     io = { open = function(path)
-      assert(path == "/proc/sys/kernel/random/uuid")
+      if path ~= "/proc/sys/kernel/random/uuid" then
+        if not input_config then return nil end
+        return { read = function() return input_config end, close = function() end }
+      end
       return { read = function() return "test-session" end, close = function() end }
     end },
     hl = {
@@ -101,5 +104,25 @@ b.expect('["ALT"]')
 b = bridge('altwin:swap_lalt_lwin_extra')
 b.key(64, 1)
 b.expect('["ALT"]')
+
+-- Device-specific options must work even when global options do not swap.
+b = bridge('compose:caps', 'hl.device({ name = "keychron", kb_options = "compose:caps,altwin:swap_lalt_lwin" })')
+b.key(64, 1)
+b.expect('["SUPER"]')
+b.tick()
+b.expect('["SUPER"]')
+b.key(64, 0); b.key(133, 1)
+b.expect('["ALT"]')
+b.reload(); b.key(64, 1)
+b.expect('["SUPER"]')
+for _, config in ipairs({
+  '-- kb_options = "altwin:swap_lalt_lwin"',
+  '--[[ kb_options = "altwin:swap_lalt_lwin" ]]',
+  '--[=[ kb_options = "altwin:swap_lalt_lwin" ]=]',
+  'kb_options = "altwin:swap_lalt_lwin_extra"',
+  'description = "altwin:swap_lalt_lwin"',
+}) do
+  b = bridge('', config); b.key(64, 1); b.expect('["ALT"]')
+end
 
 print('PASS: bridge filtering, Shift-first, dual modifiers, repeats, chords, reconciliation, reload, sequence, Alt/Super swap')

@@ -11,15 +11,29 @@ local uuid_file = assert(io.open("/proc/sys/kernel/random/uuid", "r"))
 local session = uuid_file:read("*l")
 uuid_file:close()
 
+local function contains_swap(options)
+  if type(options) ~= "string" then return false end
+  for option in options:gmatch("[^,]+") do
+    if option:match("^%s*(.-)%s*$") == "altwin:swap_lalt_lwin" then return true end
+  end
+  return false
+end
+
 local function check_swap_lalt_lwin()
-  -- Prefer the applied option to text matching (which also matched comments).
-  if type(hl.get_config) == "function" then
-    local options = hl.get_config("input:kb_options")
-    if type(options) == "string" then
-      for option in options:gmatch("[^,]+") do
-        if option:match("^%s*(.-)%s*$") == "altwin:swap_lalt_lwin" then return true end
-      end
-    end
+  if type(hl.get_config) == "function" and contains_swap(hl.get_config("input:kb_options")) then
+    return true
+  end
+  -- get_config exposes global options only, not hl.device overrides. Preserve
+  -- the original input.lua fallback for device-specific Alt/Super swaps.
+  -- Only inspect literal kb_options assignments, ignoring commented examples.
+  local file = io.open((os.getenv("HOME") or "") .. "/.config/hypr/input.lua", "r")
+  if not file then return false end
+  local content = file:read("*a")
+  file:close()
+  content = content:gsub("%-%-%[(=*)%[.-%]%1%]", "")
+  content = content:gsub("%-%-[^\n]*", "")
+  for _, options in content:gmatch("kb_options%s*=%s*(['\"])(.-)%1") do
+    if contains_swap(options) then return true end
   end
   return false
 end
